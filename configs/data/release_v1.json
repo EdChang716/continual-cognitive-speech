@@ -1,0 +1,23 @@
+{
+  "release": "data-v1",
+  "created": "2026-11-09",
+  "split_seed": 42,
+  "drive_folder_id": "1F8PnLDto77jWNNTvXChJH-DefKO3Z6Gp",
+  "access": "restricted_owner_only",
+  "bundles": [
+    {
+      "dataset": "text",
+      "file": "text_data_v1.zip",
+      "size_bytes": 1061304933,
+      "sha256": "5b42402e61ef9e2ab3eabba22c36a21013de3bfd8ce3a99681ffadcff5bce975",
+      "members": 12
+    },
+    {
+      "dataset": "taukadial",
+      "file": "taukadial_data_v1.zip",
+      "size_bytes": 2659945299,
+      "sha256": "9d7c97d5b888f823d224c6d7f3adf82480de906455e17c0ef19c35c45d1f50f2",
+      "members": 11
+    }
+  ]
+}

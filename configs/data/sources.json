@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "datasets": {
+    "amazon": {
+      "name": "Amazon Review Full",
+      "repository": "vgaraujov/amazon_review_full",
+      "revision": "e9f7145ac04ffc10faf5001207fbb05b5b8be543",
+      "source_url": "https://huggingface.co/datasets/vgaraujov/amazon_review_full",
+      "note": "Third-party mirror of the Zhang et al. 2015 five-class benchmark; labels are already 0-4.",
+      "expected_rows": {"train": 3000000, "test": 650000},
+      "files": [
+        {"remote_path": "train.csv", "local_path": "raw/text/amazon/train.csv", "size_bytes": 1335735602, "sha256": "6616bd9f12b0212aef43a7765615c9b1ab176a472ef1d1e8ff4db927c3fcf57d"},
+        {"remote_path": "test.csv", "local_path": "raw/text/amazon/test.csv", "size_bytes": 289679990, "sha256": "f19ca1a6972d6b8009c82143bc0b323d642d8ab20f9531b4ea823e5af86a8748"}
+      ]
+    },
+    "yelp": {
+      "name": "Yelp Review Full",
+      "repository": "Yelp/yelp_review_full",
+      "revision": "c1f9ee939b7d05667af864ee1cb066393154bf85",
+      "source_url": "https://huggingface.co/datasets/Yelp/yelp_review_full",
+      "note": "Five-class benchmark, labels 0-4. See source dataset terms; code license does not cover data.",
+      "expected_rows": {"train": 650000, "test": 50000},
+      "files": [
+        {"remote_path": "yelp_review_full/train-00000-of-00001.parquet", "local_path": "raw/text/yelp/train.parquet", "size_bytes": 299436850, "sha256": "da3ca3dcc52b1e2e44195b53668610d645a59010a985dd45aa12e1109cd44601"},
+        {"remote_path": "yelp_review_full/test-00000-of-00001.parquet", "local_path": "raw/text/yelp/test.parquet", "size_bytes": 23515519, "sha256": "bf06d5969bff93ecd4a6d4b330643761ce108b42e9b8a894cf82c9df02a08540"}
+      ]
+    }
+  }
+}

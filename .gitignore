@@ -1,0 +1,16 @@
+# Datasets and derived records stay outside version control.
+/data/
+/artifacts/
+/runs/
+/checkpoints/
+/.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+.env
+*.part
+*token*.json
+*client_secret*.json
