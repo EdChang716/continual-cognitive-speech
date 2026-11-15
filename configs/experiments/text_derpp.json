@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "phase": "text",
+  "method": "derpp",
+  "seed": 42,
+  "domains": [
+    "amazon",
+    "yelp"
+  ],
+  "model": {
+    "modality": "text",
+    "name": "google-bert/bert-base-uncased",
+    "revision": "86b5e0934494bd15c9632b12f734a8a67f723594",
+    "pretrained": true,
+    "gradient_checkpointing": true
+  },
+  "data": {
+    "modality": "text",
+    "root": "data",
+    "text_dir": "processed/text",
+    "speech_dir": "processed/speech_v2",
+    "test_labels": "locked/taukadial/test_labels.csv"
+  },
+  "training": {
+    "source_epochs": 1,
+    "target_epochs": 1,
+    "batch_size": 16,
+    "lr": 3e-05,
+    "weight_decay": 0.01,
+    "max_grad_norm": 1.0,
+    "max_length": 256,
+    "precision": "float32",
+    "checkpoint_every": 500,
+    "source_selection": "source_validation_accuracy",
+    "target_selection": "domain_averaged_validation_accuracy"
+  },
+  "updates": {
+    "policy": "full",
+    "rank": 8,
+    "alpha": 16,
+    "dropout": 0.05,
+    "placement": "all"
+  },
+  "memory": {
+    "capacity": 1024,
+    "replay_batch_size": 16,
+    "alpha": 0.5,
+    "beta": 0.5,
+    "sparse_frequency": 10000,
+    "sparse_batch_size": 100,
+    "sparse_microbatch_size": 16
+  },
+  "local_adaptation": {
+    "neighbors": 32,
+    "steps": 30,
+    "lr": 0.001,
+    "anchor_strength": 0.001,
+    "microbatch_size": 8
+  },
+  "timescales": {
+    "head_interval": 1,
+    "encoder_interval": 1
+  },
+  "evaluation": {
+    "split": "validation",
+    "batch_size": 32,
+    "bootstrap_samples": 1000,
+    "confidence": 0.95
+  },
+  "runtime": {
+    "device": "cuda",
+    "num_threads": 4
+  },
+  "protocol": {
+    "common_supervised_source_checkpoint": true,
+    "memory_admission": "once_per_unique_training_example_on_first_epoch",
+    "speech_aggregation": "window_mean_then_equal_recording_mean_per_participant"
+  }
+}

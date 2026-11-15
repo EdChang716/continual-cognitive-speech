@@ -1,0 +1,13 @@
+# Verification record — 2026-11-15
+
+The following checks were completed locally before publishing the experiment code. They establish data integrity and engineering behavior; they are not full research experiments.
+
+- **122 automated tests passed.** Includes real tiny Hugging Face BERT/Whisper forwards and gradients, pretrained weight-loading from local test checkpoints, frozen modules/LoRA, ER/DER++/sparse/MbPA global behavior, nearest/random query adaptation, state restoration, exact interrupted resume with pending gradients, source-cache reuse, relocated-data resume, official-test access gates, participant aggregation, corruption rejection, and suite/summary behavior.
+- **Actual pinned pretrained BERT CPU pilot passed.** DER++, Amazon→Yelp, source2batches and target2batches, up to100selected training reviews and20validation reviews per domain. Completed in about53seconds locally. It is explicitly smoke=true and has no final-test research report. GPU performance cannot be inferred from this timing.
+- **Real speech collation passed.** The shortest retained and a complete30second English training window yielded finite `[2,80,3000]` Whisper features with valid-frame masks matching their lengths. Tiny Whisper tests exercise the entire training/evaluation pipeline; full pretrained Whisper-medium GPU training has not yet run.
+- **Complete speech export verified.** 507 candidate source WAV hashes matched ASR inputs. Each candidate's exact PCM was reconstructed from its normalized original source intervals. All1,046derived windows were read back and verified; no cross-split byte duplicates, no empty matched ASR text, all169participants retained.
+- **Standalone speech ZIP verified and restored into a clean temporary directory.** All2,076members and the whole ZIP hash matched. Re-running speech preparation from only that restored package reproduced the prepared artifacts byte-for-byte, without old workstation paths or an API.
+- **Portable metadata scan passed.** 519 JSON/JSONL/CSV files checked for workstation paths and obvious credential markers. Source exports use an explicit allowlist and exclude human reference text and old prediction outputs.
+- **Private upload verified in Drive.** Owner-only restricted folder; UI reported successful upload of speech_data_v2.zip, SHA256SUMS_v2, and README_DATA_v2.md. Existing v1 data files were retained. Committed release hashes are the download/restore integrity authority.
+
+Validation and pilot outputs are private, ignored artifacts. No final accuracy, clinical effectiveness, improvement over joint training, successful full-GPU reproduction, or publication result is claimed. CUDA resource paths require checking on the intended RunPod hardware.

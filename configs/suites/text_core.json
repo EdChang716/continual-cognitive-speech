@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "phase": "text",
+  "families": [
+    "core"
+  ],
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "memory_budgets": [
+    256,
+    1024
+  ]
+}

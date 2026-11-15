@@ -1,46 +1,51 @@
 # Private data access and RunPod setup
 
-The prepared release is stored in the owner's [dataset_CL Drive folder](https://drive.google.com/drive/folders/1F8PnLDto77jWNNTvXChJH-DefKO3Z6Gp). On November 9, 2026, the owner requested changing its previous link-visible permission to **Restricted** before uploading the clinical audio. Do not make the folder public to simplify downloads.
+The prepared release is in the owner's [dataset_CL Drive folder](https://drive.google.com/drive/folders/1F8PnLDto77jWNNTvXChJH-DefKO3Z6Gp). Its general access is **Restricted**, with the owner as the only listed user. Do not make the folder public to simplify downloads.
 
 ## Browser download
 
-Sign into the authorized Google account, open the folder, and download these files individually:
+Sign into the authorized Google account. Download `text_data_v1.zip`, `speech_data_v2.zip`, `SHA256SUMS_v2`, and `README_DATA_v2.md`. Place the ZIPs in `artifacts/data_v2/`, then run:
 
-- `text_data_v1.zip`
-- `taukadial_data_v1.zip`
-- `SHA256SUMS`
-- `README_DATA.md`
+```bash
+python scripts/restore_data.py
+```
 
-Place the ZIPs under the repository's `artifacts/data_v1/`, install the project, and run `python scripts/restore_data.py`. This checks against the release manifest committed in Git, verifies every bundled file, and extracts the original speech archives. Files that differ from existing local data cause an error instead of being overwritten.
+The default restores text and training-ready speech. The original `taukadial_data_v1.zip` remains unchanged and is optional for raw-audio audits. Download it too and use `--dataset all` to restore every package. Select a single package with `--dataset text`, `--dataset speech_v2`, or `--dataset taukadial`.
+
+Restore compares whole-archive SHA256 against the manifest committed in Git, checks every member, and rejects conflicting existing data. The speech-v2 package contains its original recording-level split CSV dependencies and locked test labels, so training/regeneration does not require downloading the much larger raw-v1 archive. To restore an older release explicitly, use `--release 1 --dataset all --bundle-dir artifacts/data_v1`.
 
 ## RunPod or another headless Linux server
 
-Install Python 3.10+, Git, curl, and [rclone](https://rclone.org/install/) using their official distribution/package sources. Clone the project and install it as shown in the README. Use persistent storage for the repository and data if the GPU pod may be terminated.
+Install Python3.10+, Git, curl, and [rclone](https://rclone.org/install/) from their official distributions/package sources. Use persistent storage for code, data, model caches, and runs. Clone and install the project using the README. The code does not create a GPU instance or authenticate a future instance automatically.
 
-Configure a Google Drive remote called `gdrive` with your own authorized Google account:
+Configure an authorized Google Drive remote named `gdrive`:
 
 ```bash
 rclone config
 ```
 
-Choose Google Drive and the read-only scope (`drive.readonly`) for downloading. Use the [official Drive configuration guide](https://rclone.org/drive/), including its current OAuth client requirements. The documentation warns that the shared rclone client is being retired; an existing authorized remote or your own OAuth client may be necessary. No OAuth application or credential has been created by this project.
-
-On a headless machine, answer **No** when rclone asks to open a browser. Follow the exact authorization command it prints on your own machine with a browser, and paste the resulting authorization response back into the rclone terminal. Follow the [official remote setup instructions](https://rclone.org/remote_setup/). Keep tokens and the rclone configuration out of Git and chat messages.
-
-Once the remote is authorized:
+Choose Google Drive and the read-only scope (`drive.readonly`) for downloads. Follow the [official Drive configuration guide](https://rclone.org/drive/) for OAuth client setup. On a headless server, answer **No** to opening the browser, run the exact authorization command printed by rclone on your own browser-equipped machine, and paste its response back into the server terminal. See [remote setup](https://rclone.org/remote_setup/). Keep tokens and the rclone configuration out of Git and chat messages.
 
 ```bash
 bash scripts/download_from_drive.sh gdrive
 python scripts/restore_data.py
-python -m ccspeech.data.validate --full
+python -m ccspeech preflight --config configs/experiments/text_derpp.json
+python -m ccspeech preflight --config configs/experiments/speech_derpp.json
 ```
 
-The download script copies only the four named release files from the specified folder. It does not alter remote files, sharing settings, or other Drive folders. Authentication on a future RunPod instance is a setup step for that instance; successful preparation on the local computer does not imply that a new GPU instance is already authenticated.
+The download script copies only the named release bundles and v2 documentation from this folder. It does not change cloud files, permissions, or other folders. Anonymous `gdown --folder` cannot download the owner-restricted folder.
 
-For Phase 1 alone, Drive is optional: `python -m ccspeech.data.download` followed by `python -m ccspeech.data.text` reconstructs the same text preparation directly from pinned public sources.
+For Phase1 alone, Drive is optional:
+
+```bash
+python -m ccspeech.data.download
+python -m ccspeech.data.text --seed 42
+```
+
+These commands rebuild text from pinned public sources. Clinical source acquisition remains an authorized-data step; this repository does not obtain access for new users.
 
 ## Access and provenance
 
-TAUKADIAL access is managed through [DementiaBank / TalkBank](https://dementia.talkbank.org/TAUKADIAL/). Follow the [TalkBank ground rules](https://talkbank.org/0share/rules.html); the restricted personal archive is not a public dataset mirror. Do not share the clinical bundle with unauthorized recipients. The Amazon mirror and Yelp dataset also retain their upstream terms; availability of the project's code does not change them.
+TAUKADIAL access is managed through [DementiaBank/TalkBank](https://dementia.talkbank.org/TAUKADIAL/), subject to [TalkBank's rules](https://talkbank.org/0share/rules.html). This private archive is not a public mirror. Amazon/Yelp retain their upstream terms as well.
 
-The release contains original data and deterministic preparation outputs. It does not include previously generated speech transcripts, prior model predictions, precomputed embeddings, authentication files, or workstation-only provenance paths.
+Version1 preserves original archives and deterministic sample/participant splits. Version2 adds approved candidate audio, matched ASR text and word times, quality flags, derived windows, and sanitized provenance. It excludes workstation paths, credentials, prior model predictions, and human-reference transcripts. Prepared ASR text is not human-verified. See [speech preprocessing](speech_preprocessing.md) for the exact source and matching distinctions.

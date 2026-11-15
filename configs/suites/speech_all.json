@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "phase": "speech",
+  "families": [
+    "core",
+    "modules",
+    "placement",
+    "timescales"
+  ],
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "memory_budgets": [
+    32,
+    128
+  ]
+}

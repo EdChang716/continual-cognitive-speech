@@ -10,12 +10,13 @@ if ! command -v rclone >/dev/null 2>&1; then
   echo 'Install rclone and configure an authorized remote; see docs/data_access.md.' >&2
   exit 1
 fi
-mkdir -p "$repo_root/artifacts/data_v1"
-rclone copy "$drive_remote:" "$repo_root/artifacts/data_v1" \
+mkdir -p "$repo_root/artifacts/data_v2"
+rclone copy "$drive_remote:" "$repo_root/artifacts/data_v2" \
   --drive-root-folder-id 1F8PnLDto77jWNNTvXChJH-DefKO3Z6Gp \
   --include '/text_data_v1.zip' \
   --include '/taukadial_data_v1.zip' \
-  --include '/SHA256SUMS' \
-  --include '/README_DATA.md' \
+  --include '/speech_data_v2.zip' \
+  --include '/SHA256SUMS_v2' \
+  --include '/README_DATA_v2.md' \
   --progress
 echo 'Downloaded. Run: python scripts/restore_data.py'

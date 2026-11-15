@@ -12,7 +12,7 @@ from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED, ZIP_STORED
 from .download import sha256_file
 
 MANIFEST = "BUNDLE_MANIFEST.json"
-ALLOWED_ROOTS = {"raw", "processed", "locked", "reports"}
+ALLOWED_ROOTS = {"raw", "processed", "locked", "reports", "sources"}
 
 
 def safe_destination(root: Path, name: str) -> Path:
@@ -39,7 +39,15 @@ def source_files(root: Path, dataset: str) -> list[Path]:
             "processed/text/index.csv", "reports/text.json",
         ] + [f"processed/text/{domain}/{split}.parquet"
              for domain in ("amazon", "yelp") for split in ("train", "validation", "test")]
-    else:
+    elif dataset == "speech_v2":
+        prefixes = [str(path.relative_to(root))
+                    for folder in ("sources/speech_v2", "processed/speech_v2", "reports/speech_v2")
+                    for path in sorted((root / folder).rglob("*")) if path.is_file()]
+        if not prefixes or not (root / "processed/speech_v2/train.csv").is_file():
+            raise FileNotFoundError("Prepared speech_v2 is unavailable")
+        prefixes += ["locked/taukadial/test_labels.csv"] + [
+            f"processed/taukadial/{split}.csv" for split in ("train", "validation", "test")]
+    elif dataset == "taukadial":
         prefixes = [
             "raw/taukadial/archives/TAUKADIAL-24-train.tgz",
             "raw/taukadial/archives/TAUKADIAL-24-test.tgz",
@@ -47,6 +55,8 @@ def source_files(root: Path, dataset: str) -> list[Path]:
             "locked/taukadial/testgroundtruth.csv", "locked/taukadial/test_labels.csv",
             "reports/taukadial/audit.json", "reports/taukadial/file_hashes.json",
         ] + [f"processed/taukadial/{split}.csv" for split in ("train", "validation", "test")]
+    else:
+        raise ValueError("Unknown dataset bundle")
     files = []
     for prefix in prefixes:
         path = root / prefix
@@ -96,7 +106,7 @@ def verify_members(archive: ZipFile) -> dict:
     if len(names) != len(set(names)):
         raise ValueError("Duplicate archive entries")
     manifest = json.loads(archive.read(MANIFEST))
-    if manifest.get("format_version") != 1 or manifest.get("dataset") not in {"text", "taukadial"}:
+    if manifest.get("format_version") != 1 or manifest.get("dataset") not in {"text", "taukadial", "speech_v2"}:
         raise ValueError("Unsupported data bundle format")
     records = manifest["files"]
     expected = {record["path"] for record in records}
@@ -157,7 +167,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     subs = parser.add_subparsers(dest="action", required=True)
     create = subs.add_parser("build")
-    create.add_argument("--dataset", choices=["text", "taukadial"], required=True)
+    create.add_argument("--dataset", choices=["text", "taukadial", "speech_v2"], required=True)
     create.add_argument("--data-root", type=Path, default=Path("data"))
     create.add_argument("--output", type=Path, required=True)
     install = subs.add_parser("restore")

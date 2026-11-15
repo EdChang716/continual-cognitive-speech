@@ -1,0 +1,31 @@
+{
+  "release": "data_v2",
+  "created": "2026-11-15",
+  "split_seed": 42,
+  "drive_folder_id": "1F8PnLDto77jWNNTvXChJH-DefKO3Z6Gp",
+  "access": "restricted_owner_only",
+  "bundles": [
+    {
+      "dataset": "text",
+      "file": "text_data_v1.zip",
+      "size_bytes": 1061304933,
+      "sha256": "5b42402e61ef9e2ab3eabba22c36a21013de3bfd8ce3a99681ffadcff5bce975",
+      "members": 12
+    },
+    {
+      "dataset": "taukadial",
+      "file": "taukadial_data_v1.zip",
+      "size_bytes": 2659945299,
+      "sha256": "9d7c97d5b888f823d224c6d7f3adf82480de906455e17c0ef19c35c45d1f50f2",
+      "members": 11
+    },
+    {
+      "file": "speech_data_v2.zip",
+      "dataset": "speech_v2",
+      "size_bytes": 1382808343,
+      "sha256": "880b5c7fae974019bc7d8d08b3384311f00e2f5d58c7bde8c56f044e116241c6",
+      "members": 2076
+    }
+  ],
+  "protocol": "Text v1 plus training-ready candidate speech v2; raw TAUKADIAL v1 retained unchanged."
+}
