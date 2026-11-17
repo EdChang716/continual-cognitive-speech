@@ -4,7 +4,7 @@
 
 Compare how bounded replay, historical predictions, query-local adaptation, and selective parameter updates balance learning a new domain with retaining an earlier domain. Phase 1 uses **Amazon ↔ Yelp five-star classification** with BERT. Phase 2 uses **English ↔ Mandarin normal cognition / mild cognitive impairment (MCI)** classification with a Whisper encoder. Both are domain-incremental tasks with unchanged label sets.
 
-**Implemented:** data download/restore, training-ready speech windows and matched ASR text, ER/DER++/MbPA++-style experiments, baselines, LoRA/module/frequency ablations, resumable training, validation selection, and separate final-test evaluation. 144 tests pass, including actual tiny BERT and Whisper models; a real pretrained BERT CPU pilot also passed. Full pretrained GPU experiments and research results have not yet been run. See [verification](docs/verification.md). This is a controlled adaptation of the papers, not reproduction of their published benchmark scores or a full Nested Learning/HOPE implementation.
+**Implemented:** data download/restore, training-ready speech windows and matched ASR text, ER/DER++/MbPA++-style experiments, baselines, LoRA/module/frequency ablations, resumable training, validation selection, and separate final-test evaluation. 152 tests pass, including actual tiny BERT and Whisper models; a real pretrained BERT CPU pilot also passed. Full pretrained GPU experiments and research results have not yet been run. See [verification](docs/verification.md). This is a controlled adaptation of the papers, not reproduction of their published benchmark scores or a full Nested Learning/HOPE implementation.
 
 ## Prepared data
 
@@ -19,6 +19,8 @@ All 507 complete TAUKADIAL participant-candidate recordings are retained as port
 A [source-transcript audit](docs/transcript_comparison.md) compares all507 recordings with their matched Chou/Delaware references, separating raw ASR, candidate ASR, and retained-window coverage. The private report flags discrepancies; it does not certify speaker purity.
 
 An [original-audio audit](docs/audio_identity.md) separately checks source waveform identity and time offsets. Chou recordings align at zero offset; most Delaware recordings are crops of longer sessions, with six edited-task exceptions in the prior crosswalk. CHAT timestamps must use their verified media clock, which can differ from the raw-WAV clock. Local Chou references are untimed CSV text.
+
+The [final-source-reference audit](docs/source_cut_validation.md) uses the user's final Chou full-task texts and559 old windows to check coverage and agreement; all model audio still comes from TAUKADIAL. Against the final Chou full references, candidate CER is15.45% versus13.59% for raw ASR, with more deletions. Final Delaware task audio has additional edits and requires piecewise alignment before its complete text can be used for most TAUKADIAL clips. These quality findings remain review items, not a certification of participant-only audio.
 
 Text preparation preserves full raw sources, uses deterministic balanced splits, and filters normalized duplicates across domains and splits. Official speech-test diagnoses stay under `data/locked/`; training never opens them. Matching text is included for inspection and future work; the current speech classifier consumes **audio only**, using the Whisper encoder and a linear head.
 
