@@ -12,5 +12,10 @@
   "memory_budgets": [
     32,
     128
-  ]
+  ],
+  "overrides": {
+    "data": {
+      "speech_dir": "processed/speech_v3"
+    }
+  }
 }

@@ -4,15 +4,18 @@ The prepared release is in the owner's [dataset_CL Drive folder](https://drive.g
 
 ## Browser download
 
-Sign into the authorized Google account. Download `text_data_v1.zip`, `speech_data_v2.zip`, `SHA256SUMS_v2`, and `README_DATA_v2.md`. Place the ZIPs in `artifacts/data_v2/`, then run:
+Sign into the authorized Google account. For the current speech project, download `speech_data_v3.zip`, `SHA256SUMS_v3`, and `README_DATA_v3.md`. Place the ZIP in `artifacts/data_v3/`, then run:
 
 ```bash
-python scripts/restore_data.py
+python scripts/restore_data.py --release 3 --dataset speech_v3
+python -m ccspeech preflight --config configs/experiments/speech_derpp.json
 ```
 
-The default restores text and training-ready speech. The original `taukadial_data_v1.zip` remains unchanged and is optional for raw-audio audits. Download it too and use `--dataset all` to restore every package. Select a single package with `--dataset text`, `--dataset speech_v2`, or `--dataset taukadial`.
+To use the review-text experiments too, download `text_data_v1.zip` into the same directory and run `python scripts/restore_data.py` (default: release3, training inputs). The original `taukadial_data_v1.zip` remains unchanged and is optional for raw-audio audits. Download it too and use `--dataset all` to restore every package. Select one package with `--dataset text`, `--dataset speech_v3`, or `--dataset taukadial`.
 
-Restore compares whole-archive SHA256 against the manifest committed in Git, checks every member, and rejects conflicting existing data. The speech-v2 package contains its original recording-level split CSV dependencies and locked test labels, so training/regeneration does not require downloading the much larger raw-v1 archive. To restore an older release explicitly, use `--release 1 --dataset all --bundle-dir artifacts/data_v1`.
+Restore compares whole-archive SHA256 against the manifest committed in Git, checks every member, and rejects conflicting existing data. The speech package contains complete candidate audio, matched ASR word times, source interval maps, original recording-level split CSVs and separately locked test labels. Training/window regeneration does not require the larger raw-v1 archive or the previous workstation. V3 retains uncertain English sources separately from default model inputs; see [the v3 protocol](speech_preprocessing_v3.md).
+
+To restore an older release explicitly, use `--release 2 --dataset speech_v2 --bundle-dir artifacts/data_v2` or `--release 1 --dataset all --bundle-dir artifacts/data_v1`. V3 speech configs point to `processed/speech_v3`; reproducing v2 additionally requires setting `data.speech_dir` to `processed/speech_v2`.
 
 ## RunPod or another headless Linux server
 
@@ -24,16 +27,19 @@ Configure an authorized Google Drive remote named `gdrive`:
 rclone config
 ```
 
-Choose Google Drive and the read-only scope (`drive.readonly`) for downloads. Follow the [official Drive configuration guide](https://rclone.org/drive/) for OAuth client setup. On a headless server, answer **No** to opening the browser, run the exact authorization command printed by rclone on your own browser-equipped machine, and paste its response back into the server terminal. See [remote setup](https://rclone.org/remote_setup/). Keep tokens and the rclone configuration out of Git and chat messages.
+Choose Google Drive and the read-only scope (`drive.readonly`) for downloads. Follow the [official Drive configuration guide](https://rclone.org/drive/) for your own OAuth client setup; the installed rclone warns that its old shared client is being retired. On a headless server, answer **No** to opening the browser, run the exact authorization command printed by rclone on your own browser-equipped machine, and paste its response back into the server terminal. See [remote setup](https://rclone.org/remote_setup/). Keep tokens and the rclone configuration out of Git and chat messages. An already authorized remote can be reused by substituting its name for `gdrive`.
 
 ```bash
-bash scripts/download_from_drive.sh gdrive
-python scripts/restore_data.py
-python -m ccspeech preflight --config configs/experiments/text_derpp.json
+bash scripts/download_from_drive.sh gdrive 3 speech_v3
+python scripts/restore_data.py --release 3 --dataset speech_v3
 python -m ccspeech preflight --config configs/experiments/speech_derpp.json
+
+# Optional: both text and speech training inputs.
+bash scripts/download_from_drive.sh gdrive 3 training
+python scripts/restore_data.py
 ```
 
-The download script copies only the named release bundles and v2 documentation from this folder. It does not change cloud files, permissions, or other folders. Anonymous `gdown --folder` cannot download the owner-restricted folder.
+The download script selects filenames from the committed release manifest and copies only those bundles and that version's documentation. Its arguments are remote name, release number, and dataset selection; default selection is `training`. Use `all` for the optional raw archive, or `2 speech_v2` for the previous speech release. It does not change cloud files, permissions, or other folders. Anonymous `gdown --folder` cannot download the owner-restricted folder.
 
 For Phase1 alone, Drive is optional:
 
@@ -48,4 +54,4 @@ These commands rebuild text from pinned public sources. Clinical source acquisit
 
 TAUKADIAL access is managed through [DementiaBank/TalkBank](https://dementia.talkbank.org/TAUKADIAL/), subject to [TalkBank's rules](https://talkbank.org/0share/rules.html). This private archive is not a public mirror. Amazon/Yelp retain their upstream terms as well.
 
-Version1 preserves original archives and deterministic sample/participant splits. Version2 adds approved candidate audio, matched ASR text and word times, quality flags, derived windows, and sanitized provenance. It excludes workstation paths, credentials, prior model predictions, and human-reference transcripts. Prepared ASR text is not human-verified. See [speech preprocessing](speech_preprocessing.md) for the exact source and matching distinctions.
+Version1 preserves original archives and deterministic sample/participant splits. Version2 adds candidate audio and timestamp-matched ASR. Version3 adds conservative supported interval recovery, fresh ASR for changed audio, explicit quarantine, complete short-tail coverage and versioned quality reports. Portable releases exclude workstation paths, credentials, prior diagnostic predictions and human-reference text. Prepared ASR text and speaker labels are not manually certified. See [v3 preprocessing](speech_preprocessing_v3.md) and the [historical v2 protocol](speech_preprocessing.md).

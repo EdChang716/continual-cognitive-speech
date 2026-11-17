@@ -1,5 +1,7 @@
 # TAUKADIAL speech inputs, version 2
 
+This page documents the historical v2 release. New experiments use [speech v3](speech_preprocessing_v3.md), which adds conservative interval repair, quarantine and complete short-tail coverage.
+
 The approved `speech_v2` condition uses the existing TAUKADIAL participant-candidate audio and existing, independently decoded Whisper-large-v3 word timestamps. It applies WhisperCARE's verified window policy, then matches ASR tokens locally to each window. It does **not** use GPT to select human-reference spans, and it does not certify the candidate audio as manually verified participant-only speech.
 
 ## What matches WhisperCARE

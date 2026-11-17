@@ -26,17 +26,24 @@ MATCH_METHODS = {"asr_word_timestamps", "whisper_medium_gpt_reference"}
 ASR_REVISION = "49e6aa286ad60c14352c404340ded53710378a11"
 
 
-def window_bounds(num_samples: int, sample_rate: int = SAMPLE_RATE) -> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
-    """Return retained and dropped sample intervals using WhisperCARE's loop."""
+def window_bounds(num_samples: int, sample_rate: int = SAMPLE_RATE, *,
+                  min_tail_seconds: float = MIN_TAIL_SECONDS) -> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
+    """Return sample intervals; the default preserves the v2 WhisperCARE policy.
+
+    Explicitly versioned protocols can pass zero to retain all nonempty tails.
+    No policy pads the saved audio or emits a redundant fully covered tail.
+    """
     if isinstance(num_samples, bool) or not isinstance(num_samples, int) or num_samples < 0:
         raise ValueError("num_samples must be a nonnegative integer")
     if sample_rate <= 0:
         raise ValueError("sample_rate must be positive")
+    if not math.isfinite(min_tail_seconds) or not 0 <= min_tail_seconds <= WINDOW_SECONDS:
+        raise ValueError("min_tail_seconds must be finite and between zero and the window length")
     retained, dropped = [], []
     start = 0
     while start < num_samples:
         end = min(start + WINDOW_SECONDS * sample_rate, num_samples)
-        if end - start < MIN_TAIL_SECONDS * sample_rate:
+        if end - start < min_tail_seconds * sample_rate:
             dropped.append((start, end))
             break
         retained.append((start, end))

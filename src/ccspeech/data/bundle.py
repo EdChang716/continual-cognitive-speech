@@ -13,6 +13,7 @@ from .download import sha256_file
 
 MANIFEST = "BUNDLE_MANIFEST.json"
 ALLOWED_ROOTS = {"raw", "processed", "locked", "reports", "sources"}
+SPEECH_BUNDLES = {"speech_v2", "speech_v3"}
 
 
 def safe_destination(root: Path, name: str) -> Path:
@@ -39,12 +40,12 @@ def source_files(root: Path, dataset: str) -> list[Path]:
             "processed/text/index.csv", "reports/text.json",
         ] + [f"processed/text/{domain}/{split}.parquet"
              for domain in ("amazon", "yelp") for split in ("train", "validation", "test")]
-    elif dataset == "speech_v2":
+    elif dataset in SPEECH_BUNDLES:
         prefixes = [str(path.relative_to(root))
-                    for folder in ("sources/speech_v2", "processed/speech_v2", "reports/speech_v2")
+                    for folder in (f"sources/{dataset}", f"processed/{dataset}", f"reports/{dataset}")
                     for path in sorted((root / folder).rglob("*")) if path.is_file()]
-        if not prefixes or not (root / "processed/speech_v2/train.csv").is_file():
-            raise FileNotFoundError("Prepared speech_v2 is unavailable")
+        if not prefixes or not (root / f"processed/{dataset}/train.csv").is_file():
+            raise FileNotFoundError(f"Prepared {dataset} is unavailable")
         prefixes += ["locked/taukadial/test_labels.csv"] + [
             f"processed/taukadial/{split}.csv" for split in ("train", "validation", "test")]
     elif dataset == "taukadial":
@@ -106,7 +107,7 @@ def verify_members(archive: ZipFile) -> dict:
     if len(names) != len(set(names)):
         raise ValueError("Duplicate archive entries")
     manifest = json.loads(archive.read(MANIFEST))
-    if manifest.get("format_version") != 1 or manifest.get("dataset") not in {"text", "taukadial", "speech_v2"}:
+    if manifest.get("format_version") != 1 or manifest.get("dataset") not in {"text", "taukadial"} | SPEECH_BUNDLES:
         raise ValueError("Unsupported data bundle format")
     records = manifest["files"]
     expected = {record["path"] for record in records}
@@ -167,7 +168,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     subs = parser.add_subparsers(dest="action", required=True)
     create = subs.add_parser("build")
-    create.add_argument("--dataset", choices=["text", "taukadial", "speech_v2"], required=True)
+    create.add_argument("--dataset", choices=["text", "taukadial", *sorted(SPEECH_BUNDLES)], required=True)
     create.add_argument("--data-root", type=Path, default=Path("data"))
     create.add_argument("--output", type=Path, required=True)
     install = subs.add_parser("restore")

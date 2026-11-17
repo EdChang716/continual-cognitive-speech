@@ -18,7 +18,7 @@
     "modality": "audio",
     "root": "data",
     "text_dir": "processed/text",
-    "speech_dir": "processed/speech_v2",
+    "speech_dir": "processed/speech_v3",
     "test_labels": "locked/taukadial/test_labels.csv"
   },
   "training": {
