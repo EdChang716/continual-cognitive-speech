@@ -4,7 +4,7 @@
 
 Compare how bounded replay, historical predictions, query-local adaptation, and selective parameter updates balance learning a new domain with retaining an earlier domain. Phase 1 uses **Amazon ↔ Yelp five-star classification** with BERT. Phase 2 uses **English ↔ Mandarin normal cognition / mild cognitive impairment (MCI)** classification with a Whisper encoder. Both are domain-incremental tasks with unchanged label sets.
 
-**Implemented:** data download/restore, training-ready speech windows and matched ASR text, ER/DER++/MbPA++-style experiments, baselines, LoRA/module/frequency ablations, resumable training, validation selection, and separate final-test evaluation. 122 tests pass, including actual tiny BERT and Whisper models; a real pretrained BERT CPU pilot also passed. Full pretrained GPU experiments and research results have not yet been run. See [verification](docs/verification.md). This is a controlled adaptation of the papers, not reproduction of their published benchmark scores or a full Nested Learning/HOPE implementation.
+**Implemented:** data download/restore, training-ready speech windows and matched ASR text, ER/DER++/MbPA++-style experiments, baselines, LoRA/module/frequency ablations, resumable training, validation selection, and separate final-test evaluation. 138 tests pass, including actual tiny BERT and Whisper models; a real pretrained BERT CPU pilot also passed. Full pretrained GPU experiments and research results have not yet been run. See [verification](docs/verification.md). This is a controlled adaptation of the papers, not reproduction of their published benchmark scores or a full Nested Learning/HOPE implementation.
 
 ## Prepared data
 
@@ -16,11 +16,13 @@ Compare how bounded replay, historical predictions, query-local adaptation, and 
 
 All 507 complete TAUKADIAL participant-candidate recordings are retained as portable sources. Derived inputs are **16 kHz mono PCM16, 30-second windows, 27-second stride (10% overlap), tails ≥15 seconds retained**. All 169 participants remain represented; split by participant precedes segmentation. Match existing Whisper-large-v3 ASR words to windows using timestamps. This is local ASR matching, not GPT matching to human transcripts. Uncertain speaker boundaries, omitted short tails, and reference-assisted source selection are recorded in quality flags and review lists. See [speech preprocessing](docs/speech_preprocessing.md).
 
+A [source-transcript audit](docs/transcript_comparison.md) compares all507 recordings with their matched Chou/Delaware references, separating raw ASR, candidate ASR, and retained-window coverage. The private report flags discrepancies; it does not certify speaker purity.
+
 Text preparation preserves full raw sources, uses deterministic balanced splits, and filters normalized duplicates across domains and splits. Official speech-test diagnoses stay under `data/locked/`; training never opens them. Matching text is included for inspection and future work; the current speech classifier consumes **audio only**, using the Whisper encoder and a linear head.
 
 ## 1. Install on RunPod or your machine
 
-Use Python 3.10+ and persistent storage. Training dependencies were tested with Python 3.11, PyTorch 2.8.0, and Transformers 4.51.3. Full runs default to CUDA; CPU is supported for smoke tests.
+Use Python 3.10+ and persistent storage. Training dependencies were tested with Python 3.12, PyTorch 2.8.0, and Transformers 4.51.3. Full runs default to CUDA; CPU is supported for smoke tests.
 
 ```bash
 git clone git@github.com:EdChang716/continual-cognitive-speech.git
@@ -28,7 +30,7 @@ cd continual-cognitive-speech
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -e '.[train,dev]'
+python -m pip install -e '.[train,audit,dev]'
 export TOKENIZERS_PARALLELISM=false
 # Use a persistent directory for downloaded pretrained weights.
 export HF_HOME="$PWD/artifacts/huggingface"

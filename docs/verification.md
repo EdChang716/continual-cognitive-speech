@@ -11,3 +11,7 @@ The following checks were completed locally before publishing the experiment cod
 - **Private upload verified in Drive.** Owner-only restricted folder; UI reported successful upload of speech_data_v2.zip, SHA256SUMS_v2, and README_DATA_v2.md. Existing v1 data files were retained. Committed release hashes are the download/restore integrity authority.
 
 Validation and pilot outputs are private, ignored artifacts. No final accuracy, clinical effectiveness, improvement over joint training, successful full-GPU reproduction, or publication result is claimed. CUDA resource paths require checking on the intended RunPod hardware.
+
+## Transcript-audit addition — 2026-11-17
+
+138 tests passed in the current Python3.12 environment, including16 new audit/report tests. All507 real recordings were compared with matched Chou/Delaware references; all current window transcripts matched their source words. The self-contained private HTML contains507 recording panels, one fixed script, and no external resource links. See [comparison protocol and aggregate results](transcript_comparison.md). Audio, ASR text, participant splits and model settings were unchanged.
