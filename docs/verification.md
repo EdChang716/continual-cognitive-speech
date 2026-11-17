@@ -15,3 +15,7 @@ Validation and pilot outputs are private, ignored artifacts. No final accuracy, 
 ## Transcript-audit addition — 2026-11-17
 
 138 tests passed in the current Python3.12 environment, including16 new audit/report tests. All507 real recordings were compared with matched Chou/Delaware references; all current window transcripts matched their source words. The self-contained private HTML contains507 recording panels, one fixed script, and no external resource links. See [comparison protocol and aggregate results](transcript_comparison.md). Audio, ASR text, participant splits and model settings were unchanged.
+
+## Original-audio audit addition — 2026-11-17
+
+144 tests passed, including six new tests for original-file integrity, constant shifts, edited audio, silence/partial-coverage rejection, cloud placeholders, and independent CHAT clocks. The physical audit freshly verified421 source/TAUKADIAL pairs:216 Chou zero-offset pairs,202 Delaware raw-session crops, and three edited-task matches using local anchors only. The other86 pairs had at least one cloud placeholder and retain explicitly labeled prior evidence. Fresh constant-shift matches all had five consistent anchors. Original audio, training release, ASR text and participant splits were unchanged. See [audio identity and clock audit](audio_identity.md).

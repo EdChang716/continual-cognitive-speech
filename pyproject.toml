@@ -11,7 +11,10 @@ dependencies = ["pyarrow==23.0.1"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<9"]
-audit = ["opencc-python-reimplemented==0.1.7", "rapidfuzz==3.14.3"]
+audit = [
+    "opencc-python-reimplemented==0.1.7", "rapidfuzz==3.14.3",
+    "numpy==2.2.6", "scipy==1.15.3",
+]
 train = [
     "torch==2.8.0", "transformers==4.51.3", "numpy==2.2.6",
     "scipy==1.15.3", "soundfile==0.13.1", "scikit-learn==1.6.1",
